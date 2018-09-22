@@ -47,6 +47,8 @@
 <button type="button" onclick="renderComponent(false, false)">Render component</button>
 <button type="button" onclick="renderComponent(true, 'rAF+setTimeout')">Render component with rAF+setTimeout mark</button>
 <button type="button" onclick="renderComponent(true, 'rAF+setTimeout', true)">Render component with rAF+setTimeout mark and gBCR</button>
+<button type="button" onclick="renderComponent(true, 'rAF+Promise')">Render component with Promise microtask</button>
+<button type="button" onclick="renderComponent(true, 'rAF+rAF')">Render component with double rAF</button>
 <div id="component"></div>
 <script>
   (function () {
@@ -123,6 +125,24 @@
             performance.mark('end')
             performance.measure('total', 'start', 'end')
             performance.measure('rAF to end', 'rAF', 'end')
+          })
+        })
+      } else if (endMark === 'rAF+Promise') {
+        requestAnimationFrame(function () {
+          performance.mark('rAF')
+          Promise.resolve().then(function () {
+            performance.mark('end')
+            performance.measure('total', 'start', 'end')
+            performance.measure('rAF to end', 'rAF', 'end')
+          })
+        })
+      } else if (endMark === 'rAF+rAF') {
+        requestAnimationFrame(function () {
+          performance.mark('rAF')
+          requestAnimationFrame(function () {
+            performance.mark('end')
+            performance.measure('total', 'start', 'end')
+            performance.measure('first rAF to end', 'rAF', 'end')
           })
         })
       }
