@@ -44,7 +44,9 @@
 </head>
 <body>
 <h1>Measure style and layout - demo</h1>
-<button type="button" onclick="renderComponent()">Render component</button>
+<button type="button" onclick="renderComponent(false, false)">Render component</button>
+<button type="button" onclick="renderComponent(true, 'rAF+setTimeout')">Render component with rAF+setTimeout mark</button>
+<button type="button" onclick="renderComponent(true, 'rAF+setTimeout', true)">Render component with rAF+setTimeout mark and gBCR</button>
 <div id="component"></div>
 <script>
   (function () {
@@ -95,7 +97,7 @@
         for (var key2 in obj) {
           delete obj[key2]
         }
-        window.obj = obj
+        window.obj = obj // avoid dead code elimination
       }
 
       for (var i = 0; i < 100; i++) {
@@ -103,11 +105,27 @@
       }
     }
 
-    function renderComponent () {
+    function renderComponent (startMark, endMark, callGBCR) {
+      if (startMark) {
+        performance.mark('start')
+      }
       clearComponent()
       doJavaScriptWork()
       var table = createTable()
       $component.appendChild(table)
+      if (callGBCR) {
+        window.myRect = $component.getBoundingClientRect() // avoid dead code elimination
+      }
+      if (endMark === 'rAF+setTimeout') {
+        requestAnimationFrame(function () {
+          performance.mark('rAF')
+          setTimeout(function () {
+            performance.mark('end')
+            performance.measure('total', 'start', 'end')
+            performance.measure('rAF to end', 'rAF', 'end')
+          })
+        })
+      }
     }
 
     window.renderComponent = renderComponent
