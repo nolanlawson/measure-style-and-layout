@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Measure style and layout - demo</title>
+  <style>
+    /* the goal of these selectors is to be stupidly unperformant */
+
+    #component .table .tbody .row[even="true"]:nth-child(even) + .row[odd="true"]:nth-child(odd) {
+      font-size: 1.2em;
+    }
+
+    #component .table .tbody .row .cell:nth-child(even) {
+      background: aqua;
+    }
+
+    #component .table .tbody .row .cell:nth-child(odd) {
+      background: chocolate;
+    }
+
+    #component .table .tbody .row .cell:nth-child(even) + .cell:nth-child(odd) {
+      font-weight: bold;
+    }
+
+    #component .table .tbody .row .cell:nth-child(odd) + .cell:nth-child(even) {
+      font-size: 1.1em;
+    }
+
+    #component .table .tbody .row .cell[even="true"]:nth-child(even) + .cell[odd="true"]:nth-child(odd) {
+      font-weight: bold;
+    }
+
+    #component .table .tbody .row:nth-child(even) {
+      height: 40px;
+      overflow: hidden;
+    }
+
+    #component .table .tbody .row:nth-child(odd) {
+      height: 30px;
+      overflow: hidden;
+    }
+
+  </style>
+</head>
+<body>
+<h1>Measure style and layout - demo</h1>
+<button type="button" onclick="renderComponent()">Render component</button>
+<div id="component"></div>
+<script>
+  (function () {
+    'use strict'
+
+    var $ = document.querySelector.bind(document)
+    var $component = $('#component')
+
+    function clearComponent () {
+      $component.innerHTML = ''
+    }
+
+    function createTable() {
+      var table = document.createElement('table')
+      table.classList.add('table')
+      var tbody = document.createElement('tbody')
+      tbody.classList.add('tbody')
+      table.appendChild(tbody)
+      for (var i = 0; i < 100; i++) {
+        var tr = document.createElement('tr')
+        tr.classList.add('row')
+        tr.setAttribute('odd', (i % 2 === 0).toString())
+        tr.setAttribute('even', (i % 2 === 1).toString())
+        for (var j = 0; j < 10; j++) {
+          var td = document.createElement('td')
+          td.classList.add('cell')
+          td.setAttribute('odd', (j % 2 === 0).toString())
+          td.setAttribute('even', (j % 2 === 1).toString())
+          td.textContent = 'Cell ' + (i + 1) + '/' + (j + 1)
+          tr.appendChild(td)
+        }
+        tbody.appendChild(tr)
+      }
+      return table
+    }
+
+    // do some useless work to emulate real-world websites
+    function doJavaScriptWork () {
+
+      function work () {
+        var obj = {}
+        for (var i = 0; i < 10; i++) {
+          obj[btoa(Math.random().toString())] = btoa(Math.random().toString())
+        }
+        for (var key in obj) {
+          obj[key] = obj[key] + btoa(Math.random().toString())
+        }
+        for (var key2 in obj) {
+          delete obj[key2]
+        }
+        window.obj = obj
+      }
+
+      for (var i = 0; i < 100; i++) {
+        work()
+      }
+    }
+
+    function renderComponent () {
+      clearComponent()
+      doJavaScriptWork()
+      var table = createTable()
+      $component.appendChild(table)
+    }
+
+    window.renderComponent = renderComponent
+  })()
+</script>
+</body>
+</html>
